@@ -266,7 +266,6 @@
             '#ec4899', '#06b6d4', '#64748b', '#f97316', '#14b8a6'
         ];
 
-        // "6억7147만0841원" 또는 "81,493,157" 형태를 정확한 정수로 변환하는 함수
         function parseKoreanWon(valStr) {
             if (!valStr) return 0;
             if (typeof valStr === 'number') return valStr;
@@ -294,7 +293,8 @@
             return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
         }
 
-        async function fetchSheetDataByName(sheetName) {
+        // Google Viz 응답에서 헤더(cols)와 데이터(rows)를 함께 반환
+        async function fetchSheetFullDataByName(sheetName) {
             const sheetId = APP_CONFIG.SPREADSHEET_ID;
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
             
@@ -303,9 +303,12 @@
             const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
             const data = JSON.parse(jsonText);
             
-            return data.table.rows.map(row => {
+            const cols = (data.table.cols || []).map(c => (c && c.label) ? c.label.trim() : "");
+            const rows = (data.table.rows || []).map(row => {
                 return row.c ? row.c.map(cell => (cell ? (cell.f ? cell.f : (cell.v !== null ? cell.v : "")) : "")) : [];
             });
+
+            return { cols, rows };
         }
 
         function switchTab(tabId) {
@@ -392,10 +395,23 @@
         async function initApp() {
             try {
                 // 1. 대시보드 요약
-                const dashRows = await fetchSheetDataByName(APP_CONFIG.TABS.DASHBOARD);
-                const totalWorth = dashRows[1][1] || "0";
+                const dashData = await fetchSheetFullDataByName(APP_CONFIG.TABS.DASHBOARD);
+                const dashRows = dashData.rows;
+                
+                // '총 순자산' 행을 이름으로 탐색 (인덱스 밀림 방지)
+                let totalWorth = "0";
+                for (let r = 0; r < dashRows.length; r++) {
+                    if (dashRows[r][0] && dashRows[r][0].includes("총 순자산")) {
+                        totalWorth = dashRows[r][1] || "0";
+                        break;
+                    }
+                }
+                if (totalWorth === "0" && dashRows.length > 1) {
+                    totalWorth = dashRows[1][1] || "0";
+                }
                 document.getElementById('totalNetWorth').innerText = (typeof totalWorth === 'number' ? totalWorth.toLocaleString() : totalWorth) + " 원";
 
+                // KOSPI / NASDAQ 탐색
                 let kospi = "-";
                 let nasdaq = "-";
                 for (let r = 0; r < Math.min(3, dashRows.length); r++) {
@@ -419,12 +435,17 @@
                 const dashboardCategoryMap = {};
                 let summaryHtml = "";
 
-                for (let i = 2; i < 10; i++) {
+                // 총 순자산 제외 개별 자산 항목 파싱
+                for (let i = 0; i < dashRows.length; i++) {
                     const r = dashRows[i];
-                    if (!r || !r[0]) continue;
+                    if (!r || !r[0] || r[0].includes("총 순자산") || r[0].includes("자산 분류")) continue;
+                    if (r[0].includes("합계")) continue;
+                    
                     const name = r[0];
                     const amountStr = String(r[1] || "0");
                     const rawVal = parseKoreanWon(amountStr);
+                    if (rawVal === 0) continue;
+
                     const weight = r[2] || "0%";
                     const note = r[6] || "";
 
@@ -459,96 +480,93 @@
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
                 });
 
-                // 2. 해외주식
+                // 2. 세부 탭들
                 if (APP_CONFIG.TABS.OVERSEAS) {
-                    try {
-                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.OVERSEAS);
-                        renderDetailedSection(rows, 'overseasTableBody', 'overseasTotal', 'overseasCount', dashboardCategoryMap['2-2. 주식투자(해외)']);
-                    } catch(e) { console.warn("해외주식 로드 실패", e); }
+                    const d = await fetchSheetFullDataByName(APP_CONFIG.TABS.OVERSEAS);
+                    renderDetailedSection(d.rows, 'overseasTableBody', 'overseasTotal', 'overseasCount');
                 }
-
-                // 3. 국내주식
                 if (APP_CONFIG.TABS.DOMESTIC) {
-                    try {
-                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.DOMESTIC);
-                        renderDetailedSection(rows, 'domesticTableBody', 'domesticTotal', 'domesticCount', dashboardCategoryMap['2-1. 주식투자(국내)']);
-                    } catch(e) { console.warn("국내주식 로드 실패", e); }
+                    const d = await fetchSheetFullDataByName(APP_CONFIG.TABS.DOMESTIC);
+                    renderDetailedSection(d.rows, 'domesticTableBody', 'domesticTotal', 'domesticCount');
                 }
-
-                // 4. ISA
                 if (APP_CONFIG.TABS.ISA) {
-                    try {
-                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.ISA);
-                        renderDetailedSection(rows, 'isaTableBody', 'isaTotal', 'isaCount', dashboardCategoryMap['3. 중개형 ISA']);
-                    } catch(e) { console.warn("ISA 로드 실패", e); }
+                    const d = await fetchSheetFullDataByName(APP_CONFIG.TABS.ISA);
+                    renderDetailedSection(d.rows, 'isaTableBody', 'isaTotal', 'isaCount');
                 }
-
-                // 5. 연금&보험
                 if (APP_CONFIG.TABS.PENSION) {
-                    try {
-                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.PENSION);
-                        renderDetailedSection(rows, 'pensionTableBody', 'pensionTotal', 'pensionCount', dashboardCategoryMap['4. 연금저축 & 보험']);
-                    } catch(e) { console.warn("연금&보험 로드 실패", e); }
+                    const d = await fetchSheetFullDataByName(APP_CONFIG.TABS.PENSION);
+                    renderDetailedSection(d.rows, 'pensionTableBody', 'pensionTotal', 'pensionCount');
                 }
-
-                // 6. 퇴직연금(IRP)
                 if (APP_CONFIG.TABS.IRP) {
-                    try {
-                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.IRP);
-                        renderDetailedSection(rows, 'irpTableBody', 'irpTotal', 'irpCount', dashboardCategoryMap['5. 퇴직연금(IRP)']);
-                    } catch(e) { console.warn("IRP 로드 실패", e); }
+                    const d = await fetchSheetFullDataByName(APP_CONFIG.TABS.IRP);
+                    renderDetailedSection(d.rows, 'irpTableBody', 'irpTotal', 'irpCount');
                 }
 
-                // 7. 누적 추이 차트 (보내주신 테이블 열 매핑 완벽 적용)
+                // 3. 자산 추이 다중 꺾은선 차트 (확정 열 매핑 적용)
                 if (APP_CONFIG.TABS.HISTORY) {
                     try {
-                        const hisRows = await fetchSheetDataByName(APP_CONFIG.TABS.HISTORY);
-                        if (hisRows && hisRows.length >= 2) {
-                            const header = hisRows[0];
+                        const hisData = await fetchSheetFullDataByName(APP_CONFIG.TABS.HISTORY);
+                        const hisRows = hisData.rows;
+
+                        if (hisRows && hisRows.length > 0) {
+                            // 확정된 13개 열 명칭 (순서 고정)
+                            const DEFINED_HEADERS = [
+                                { col: 0, label: "기록 일자", isDate: true },
+                                { col: 1, label: "총 순자산", isTotal: true },
+                                { col: 2, label: "현금가능 자산" },
+                                { col: 3, label: "1.유동현금" },
+                                { col: 4, label: "2-1.국내주식" },
+                                { col: 6, label: "2-2.해외주식" },
+                                { col: 8, label: "3.ISA" },
+                                { col: 9, label: "4.연금&보험" },
+                                { col: 10, label: "5.퇴직연금(IRP)" },
+                                { col: 11, label: "국민연금" },
+                                { col: 12, label: "퇴직금" }
+                            ];
+
                             const dates = [];
-                            const seriesList = [];
-
-                            // KOSPI(5열), NASDAQ(7열) 등 시장 지수 제외, 순수 자산 열만 필터링
-                            for (let c = 1; c < header.length; c++) {
-                                const colTitle = String(header[c]).trim();
-                                if (!colTitle || colTitle === "-" || colTitle.toUpperCase() === "KOSPI" || colTitle.toUpperCase() === "NASDAQ") {
-                                    continue;
-                                }
-                                seriesList.push({
-                                    colIndex: c,
-                                    label: colTitle,
+                            const seriesMap = {};
+                            DEFINED_HEADERS.filter(h => !h.isDate).forEach(h => {
+                                seriesMap[h.col] = {
+                                    label: h.label,
+                                    isTotal: !!h.isTotal,
                                     data: []
-                                });
-                            }
+                                };
+                            });
 
-                            // 2행부터 날짜와 각 자산 데이터 수집
-                            for (let r = 1; r < hisRows.length; r++) {
+                            // 만약 0번째 행이 헤더 텍스트('기록 일자', '총 순자산' 등)라면 1행부터, 데이터라면 0행부터 시작
+                            const isFirstRowHeader = String(hisRows[0][0]).includes("일자") || String(hisRows[0][1]).includes("순자산");
+                            const startIdx = isFirstRowHeader ? 1 : 0;
+
+                            for (let r = startIdx; r < hisRows.length; r++) {
                                 const row = hisRows[r];
                                 if (!row || !row[0]) continue;
                                 
-                                // 날짜 표기 단축 (2026-06-06 -> 06/06)
-                                let dStr = String(row[0]).trim();
-                                if (dStr.startsWith("20")) {
-                                    dStr = dStr.substring(5).replace("-", "/");
-                                }
-                                dates.push(dStr);
+                                let dateStr = String(row[0]).trim();
+                                if (!dateStr || dateStr.includes("일자")) continue;
 
-                                seriesList.forEach(series => {
-                                    const val = parseKoreanWon(row[series.colIndex]);
-                                    series.data.push(val);
+                                // 날짜 표기 형식 축약 (2026-06-06 -> 06/06)
+                                if (dateStr.length >= 10 && dateStr.startsWith("20")) {
+                                    dateStr = dateStr.substring(5).replace("-", "/");
+                                }
+                                dates.push(dateStr);
+
+                                Object.keys(seriesMap).forEach(colIdx => {
+                                    const val = parseKoreanWon(row[colIdx]);
+                                    seriesMap[colIdx].data.push(val);
                                 });
                             }
 
-                            // 차트 데이터셋 생성
-                            const datasets = seriesList.map((series, idx) => {
-                                const isTotal = series.label.includes("총 순자산");
-                                const color = isTotal ? '#1e3a8a' : COLOR_PALETTE[(idx - 1 + COLOR_PALETTE.length) % COLOR_PALETTE.length];
+                            // 차트 데이터셋 구성
+                            const datasets = Object.keys(seriesMap).map((colIdx, idx) => {
+                                const s = seriesMap[colIdx];
+                                const color = s.isTotal ? '#1e3a8a' : COLOR_PALETTE[(idx - 1 + COLOR_PALETTE.length) % COLOR_PALETTE.length];
                                 return {
-                                    label: series.label,
-                                    data: series.data,
+                                    label: s.label,
+                                    data: s.data,
                                     borderColor: color,
                                     backgroundColor: color,
-                                    borderWidth: isTotal ? 3.5 : 1.8,
+                                    borderWidth: s.isTotal ? 3.5 : 1.8,
                                     tension: 0.25,
                                     pointRadius: 3,
                                     pointHoverRadius: 6,
