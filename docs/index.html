@@ -19,35 +19,70 @@
         body { background: var(--bg); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 680px; }
         
+        /* 메인 히어로 카드 */
         .hero-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: #fff;
             border-radius: 20px;
             padding: 22px 20px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
         }
         .hero-label { font-size: 13px; opacity: 0.85; margin-bottom: 4px; }
-        .hero-total { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
+        .hero-total { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
         .market-pills { display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; font-size: 12px; }
         .market-pill { background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; }
 
-        .sub-summary-card {
+        /* 관점 전환 분할 카드 컨테이너 */
+        .split-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+            animation: fadeIn 0.35s ease;
+        }
+        .split-sub-card {
             background: #ffffff;
             border: 1px solid var(--border);
-            border-left: 4px solid var(--primary);
             border-radius: 14px;
-            padding: 16px 18px;
-            margin-bottom: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 14px 16px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-top: 4px solid var(--primary);
         }
-        .sub-summary-title { font-size: 13px; color: var(--text-sub); font-weight: 500; }
-        .sub-summary-val { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
-        .sub-summary-badge { background: #eff6ff; color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+        .split-sub-title { font-size: 12px; color: var(--text-sub); font-weight: 600; margin-bottom: 4px; }
+        .split-sub-val { font-size: 17px; font-weight: 800; color: var(--text-main); }
+        .split-sub-weight { font-size: 12px; font-weight: 700; color: var(--primary); margin-top: 4px; display: inline-block; }
 
+        /* 관점 필터 칩(버튼) 바 */
+        .view-filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            background: #edf2f7;
+            padding: 6px;
+            border-radius: 14px;
+        }
+        .filter-chip {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .filter-chip.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        /* 탭 네비게이션 */
         .nav-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
         .nav-tabs::-webkit-scrollbar { display: none; }
         .tab-btn {
@@ -69,23 +104,49 @@
         .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
 
         .list-group { display: flex; flex-direction: column; gap: 10px; }
-        .item-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+        .item-card { 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            border-radius: 14px; 
+            padding: 14px 16px; 
+            animation: fadeIn 0.3s ease;
+        }
         .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .item-name { font-size: 14px; font-weight: 600; }
         .item-val { font-size: 15px; font-weight: 700; }
         .item-sub { display: flex; gap: 8px; font-size: 12px; color: var(--text-sub); align-items: center; }
         .badge { background: #eff6ff; color: var(--primary); font-weight: 700; padding: 2px 8px; border-radius: 6px; }
 
+        .sub-summary-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 14px;
+            padding: 16px 18px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sub-summary-title { font-size: 13px; color: var(--text-sub); font-weight: 500; }
+        .sub-summary-val { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+        .sub-summary-badge { background: #eff6ff; color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); }
         th { background: #f8fafc; color: var(--text-sub); font-size: 12px; }
         .num-col { text-align: right; }
         .loading { text-align: center; padding: 30px 0; color: var(--text-sub); font-size: 13px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 메인 헤더 카드 -->
+        <!-- 상단 히어로 카드 -->
         <div class="hero-card">
             <div class="hero-label">총 순자산</div>
             <div class="hero-total" id="totalNetWorth">- 원</div>
@@ -108,8 +169,18 @@
 
         <!-- 1. 총괄 대시보드 -->
         <div id="tab-summary" class="panel active">
+            <!-- 관점 전환 버튼 그룹 -->
+            <div class="view-filter-bar">
+                <button class="filter-chip active" onclick="setPerspective('default')">기본 계좌</button>
+                <button class="filter-chip" onclick="setPerspective('lock')">🔒 봉인 vs 유동성</button>
+                <button class="filter-chip" onclick="setPerspective('risk')">⚖️ 안전 vs 성장</button>
+            </div>
+
+            <!-- 동적 분할 소계 카드 -->
+            <div class="split-card-grid" id="splitCardContainer"></div>
+
             <div class="chart-box">
-                <div class="chart-title">자산군 구성 비중</div>
+                <div class="chart-title" id="chartTitle">자산군 구성 비중</div>
                 <div style="max-height: 220px; display: flex; justify-content: center;">
                     <canvas id="assetDoughnutChart"></canvas>
                 </div>
@@ -266,6 +337,10 @@
             '#ec4899', '#06b6d4', '#64748b', '#f97316', '#14b8a6'
         ];
 
+        let doughnutChartInstance = null;
+        let globalRawItems = []; // 시트에서 가져온 원본 8대 자산 데이터
+        let globalTotalWorthNum = 0;
+
         function parseKoreanWon(valStr) {
             if (!valStr) return 0;
             if (typeof valStr === 'number') return valStr;
@@ -293,7 +368,6 @@
             return parseInt(str.replace(/[^0-9]/g, ''), 10) || 0;
         }
 
-        // Google Viz 응답에서 헤더(cols)와 데이터(rows)를 함께 반환
         async function fetchSheetFullDataByName(sheetName) {
             const sheetId = APP_CONFIG.SPREADSHEET_ID;
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
@@ -318,6 +392,146 @@
             event.target.classList.add('active');
         }
 
+        // ========================================================
+        // 🎯 인터랙티브 관점 전환 엔진
+        // ========================================================
+        function setPerspective(type) {
+            document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let groups = [];
+            let chartHeader = "자산군 구성 비중";
+
+            if (type === 'default') {
+                // 1. 기본 시트 원본 형태
+                chartHeader = "자산군별 비중 (기본)";
+                groups = globalRawItems.map(item => ({
+                    title: item.name,
+                    amount: item.amount,
+                    note: item.note,
+                    color: item.color
+                }));
+            } else if (type === 'lock') {
+                // 2. 봉인 vs 유동성 관점
+                chartHeader = "인출 가능 시점 및 봉인 여부";
+                let liquid = 0;   // 즉시 가용
+                let semi = 0;     // 준봉인 (ISA)
+                let locked55 = 0; // 55세/퇴직 봉인
+                let lockedNat = 0;// 국민연금
+
+                globalRawItems.forEach(item => {
+                    const n = item.name;
+                    if (n.includes("현금") || n.includes("국내") || n.includes("해외")) {
+                        liquid += item.amount;
+                    } else if (n.includes("ISA")) {
+                        semi += item.amount;
+                    } else if (n.includes("국민연금")) {
+                        lockedNat += item.amount;
+                    } else {
+                        locked55 += item.amount;
+                    }
+                });
+
+                groups = [
+                    { title: "⚡ 즉시 가용 자산", amount: liquid, note: "현금, 국내/해외주식 (2~3일 내 인출 가능)", color: "#2563eb" },
+                    { title: "🔓 준봉인 자산", amount: semi, note: "중개형 ISA (원금 수시 인출 / 3년 비과세)", color: "#10b981" },
+                    { title: "🔒 55세/퇴직 봉인", amount: locked55, note: "연금저축, IRP, 퇴직금 (조기해지 페널티)", color: "#f59e0b" },
+                    { title: "🏛️ 국가 보장 봉in", amount: lockedNat, note: "국민연금 (만 67세 수령 개시)", color: "#64748b" }
+                ];
+            } else if (type === 'risk') {
+                // 3. 안전 vs 성장 투자 관점
+                chartHeader = "안전 자산 vs 공격 투자 비중";
+                let safe = 0;
+                let growth = 0;
+
+                globalRawItems.forEach(item => {
+                    const n = item.name;
+                    if (n.includes("국내") || n.includes("해외") || n.includes("ISA")) {
+                        growth += item.amount;
+                    } else {
+                        safe += item.amount;
+                    }
+                });
+
+                groups = [
+                    { title: "📈 공격 성장 자산", amount: growth, note: "국내주식, 해외주식, ISA (주식형 ETF 포함)", color: "#ec4899" },
+                    { title: "🛡️ 안전 방어 자산", amount: safe, note: "유동현금, 연금/보험 원금, 퇴직금, 국민연금", color: "#06b6d4" }
+                ];
+            }
+
+            document.getElementById('chartTitle').innerText = chartHeader;
+            renderDynamicViews(groups);
+        }
+
+        function renderDynamicViews(groups) {
+            const labels = [];
+            const values = [];
+            const colors = [];
+
+            let subCardsHtml = "";
+            let listHtml = "";
+
+            groups.forEach((g, idx) => {
+                const color = g.color || COLOR_PALETTE[idx % COLOR_PALETTE.length];
+                const weightPct = globalTotalWorthNum > 0 ? ((g.amount / globalTotalWorthNum) * 100).toFixed(1) + "%" : "0%";
+                
+                labels.push(g.title);
+                values.push(g.amount);
+                colors.push(color);
+
+                // 상단 분할 요약 카드
+                subCardsHtml += `
+                    <div class="split-sub-card" style="border-top-color: ${color}">
+                        <div class="split-sub-title">${g.title}</div>
+                        <div class="split-sub-val">${(g.amount / 100000000).toFixed(2)}억</div>
+                        <span class="split-sub-weight" style="color: ${color}">${weightPct}</span>
+                    </div>
+                `;
+
+                // 하단 목록 카드
+                listHtml += `
+                    <div class="item-card">
+                        <div class="item-row">
+                            <span class="item-name" style="color:${color}"><strong>${g.title}</strong></span>
+                            <span class="item-val">${g.amount.toLocaleString()} 원</span>
+                        </div>
+                        <div class="item-sub">
+                            <span class="badge" style="background:${color}15; color:${color};">비중 ${weightPct}</span>
+                            <span>${g.note || ''}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('splitCardContainer').innerHTML = subCardsHtml;
+            document.getElementById('summaryList').innerHTML = listHtml;
+
+            // 도넛 차트 업데이트
+            if (doughnutChartInstance) {
+                doughnutChartInstance.data.labels = labels;
+                doughnutChartInstance.data.datasets[0].data = values;
+                doughnutChartInstance.data.datasets[0].backgroundColor = colors;
+                doughnutChartInstance.update();
+            } else {
+                doughnutChartInstance = new Chart(document.getElementById('assetDoughnutChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { legend: { position: 'right' } } 
+                    }
+                });
+            }
+        }
+
+        // 세부 탭 스마트 렌더러
         function renderDetailedSection(rows, tableBodyId, totalElementId, countElementId, defaultTotal = "") {
             let html = "";
             let itemCount = 0;
@@ -326,9 +540,7 @@
             let headerSum = "";
             if (rows.length > 0 && rows[0]) {
                 const nums = rows[0].filter(c => parseKoreanWon(c) >= 10000);
-                if (nums.length > 0) {
-                    headerSum = nums[nums.length - 1];
-                }
+                if (nums.length > 0) headerSum = nums[nums.length - 1];
             }
 
             for (let i = 1; i < rows.length; i++) {
@@ -382,9 +594,7 @@
             }
 
             document.getElementById(tableBodyId).innerHTML = html || '<tr><td colspan="3">데이터가 없습니다.</td></tr>';
-            if (countElementId) {
-                document.getElementById(countElementId).innerText = `${itemCount}개 항목`;
-            }
+            if (countElementId) document.getElementById(countElementId).innerText = `${itemCount}개 항목`;
 
             let finalTotalDisplay = headerSum || (computedTotal > 0 ? computedTotal.toLocaleString() : defaultTotal);
             if (totalElementId) {
@@ -394,11 +604,10 @@
 
         async function initApp() {
             try {
-                // 1. 대시보드 요약
+                // 1. 대시보드 탭 로드
                 const dashData = await fetchSheetFullDataByName(APP_CONFIG.TABS.DASHBOARD);
                 const dashRows = dashData.rows;
                 
-                // '총 순자산' 행을 이름으로 탐색 (인덱스 밀림 방지)
                 let totalWorth = "0";
                 for (let r = 0; r < dashRows.length; r++) {
                     if (dashRows[r][0] && dashRows[r][0].includes("총 순자산")) {
@@ -409,6 +618,8 @@
                 if (totalWorth === "0" && dashRows.length > 1) {
                     totalWorth = dashRows[1][1] || "0";
                 }
+                
+                globalTotalWorthNum = parseKoreanWon(totalWorth);
                 document.getElementById('totalNetWorth').innerText = (typeof totalWorth === 'number' ? totalWorth.toLocaleString() : totalWorth) + " 원";
 
                 // KOSPI / NASDAQ 탐색
@@ -430,12 +641,8 @@
                 document.getElementById('kospiVal').innerText = kospi || "-";
                 document.getElementById('nasdaqVal').innerText = nasdaq || "-";
 
-                const labels = [];
-                const values = [];
-                const dashboardCategoryMap = {};
-                let summaryHtml = "";
-
-                // 총 순자산 제외 개별 자산 항목 파싱
+                // 개별 자산군 파싱 및 글로벌 보관
+                globalRawItems = [];
                 for (let i = 0; i < dashRows.length; i++) {
                     const r = dashRows[i];
                     if (!r || !r[0] || r[0].includes("총 순자산") || r[0].includes("자산 분류")) continue;
@@ -446,39 +653,19 @@
                     const rawVal = parseKoreanWon(amountStr);
                     if (rawVal === 0) continue;
 
-                    const weight = r[2] || "0%";
                     const note = r[6] || "";
+                    const color = COLOR_PALETTE[globalRawItems.length % COLOR_PALETTE.length];
 
-                    labels.push(name);
-                    values.push(rawVal);
-                    dashboardCategoryMap[name] = amountStr;
-
-                    summaryHtml += `
-                        <div class="item-card">
-                            <div class="item-row">
-                                <span class="item-name">${name}</span>
-                                <span class="item-val">${amountStr} 원</span>
-                            </div>
-                            <div class="item-sub">
-                                <span class="badge">${weight}</span>
-                                <span>${note}</span>
-                            </div>
-                        </div>
-                    `;
+                    globalRawItems.push({
+                        name: name,
+                        amount: rawVal,
+                        note: note,
+                        color: color
+                    });
                 }
-                document.getElementById('summaryList').innerHTML = summaryHtml;
 
-                new Chart(document.getElementById('assetDoughnutChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: COLOR_PALETTE
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-                });
+                // 기본 관점으로 1회 렌더링
+                setPerspective('default');
 
                 // 2. 세부 탭들
                 if (APP_CONFIG.TABS.OVERSEAS) {
@@ -502,14 +689,13 @@
                     renderDetailedSection(d.rows, 'irpTableBody', 'irpTotal', 'irpCount');
                 }
 
-                // 3. 자산 추이 다중 꺾은선 차트 (확정 열 매핑 적용)
+                // 3. 자산 추이 다중 라인 차트
                 if (APP_CONFIG.TABS.HISTORY) {
                     try {
                         const hisData = await fetchSheetFullDataByName(APP_CONFIG.TABS.HISTORY);
                         const hisRows = hisData.rows;
 
                         if (hisRows && hisRows.length > 0) {
-                            // 확정된 13개 열 명칭 (순서 고정)
                             const DEFINED_HEADERS = [
                                 { col: 0, label: "기록 일자", isDate: true },
                                 { col: 1, label: "총 순자산", isTotal: true },
@@ -534,7 +720,6 @@
                                 };
                             });
 
-                            // 만약 0번째 행이 헤더 텍스트('기록 일자', '총 순자산' 등)라면 1행부터, 데이터라면 0행부터 시작
                             const isFirstRowHeader = String(hisRows[0][0]).includes("일자") || String(hisRows[0][1]).includes("순자산");
                             const startIdx = isFirstRowHeader ? 1 : 0;
 
@@ -545,7 +730,6 @@
                                 let dateStr = String(row[0]).trim();
                                 if (!dateStr || dateStr.includes("일자")) continue;
 
-                                // 날짜 표기 형식 축약 (2026-06-06 -> 06/06)
                                 if (dateStr.length >= 10 && dateStr.startsWith("20")) {
                                     dateStr = dateStr.substring(5).replace("-", "/");
                                 }
@@ -557,7 +741,6 @@
                                 });
                             }
 
-                            // 차트 데이터셋 구성
                             const datasets = Object.keys(seriesMap).map((colIdx, idx) => {
                                 const s = seriesMap[colIdx];
                                 const color = s.isTotal ? '#1e3a8a' : COLOR_PALETTE[(idx - 1 + COLOR_PALETTE.length) % COLOR_PALETTE.length];
