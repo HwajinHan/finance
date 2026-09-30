@@ -3,150 +3,388 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 자산 포트폴리오</title>
+    <title>통합 자산 관리 대시보드</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- ⚙️ 분리된 설정 파일 -->
+    <script src="config.js"></script>
     <style>
         :root {
             --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
             --primary: #2563eb;
             --border: #e2e8f0;
         }
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-primary); margin: 0; padding: 16px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 520px; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
+        body { background: var(--bg); color: var(--text-main); margin: 0; padding: 16px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 680px; }
         
         .hero-card {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: #ffffff;
+            color: #fff;
             border-radius: 20px;
-            padding: 24px 20px;
+            padding: 22px 20px;
+            margin-bottom: 16px;
             box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
-            margin-bottom: 20px;
         }
-        .hero-label { font-size: 13px; opacity: 0.85; margin-bottom: 6px; font-weight: 500; }
-        .hero-total { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 16px; }
-        
-        .market-pills { display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 14px; font-size: 12px; }
+        .hero-label { font-size: 13px; opacity: 0.85; margin-bottom: 4px; }
+        .hero-total { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 14px; }
+        .market-pills { display: flex; gap: 8px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; font-size: 12px; }
         .market-pill { background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; }
 
-        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; padding: 0 4px; }
-        .section-title { font-size: 16px; font-weight: 700; }
-        .sync-time { font-size: 11px; color: var(--text-secondary); }
-
-        .asset-list { display: flex; flex-direction: column; gap: 10px; }
-        .asset-card {
-            background: var(--card-bg);
-            border-radius: 14px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        .nav-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            background: #fff;
             border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            cursor: pointer;
+            white-space: nowrap;
         }
-        .card-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .category-name { font-size: 15px; font-weight: 600; }
-        .category-amount { font-size: 16px; font-weight: 700; }
-        
-        .card-sub { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .weight-badge { background: #eff6ff; color: var(--primary); font-weight: 700; padding: 2px 8px; border-radius: 6px; }
-        .target-text { color: var(--text-secondary); }
-        .note-text { color: #94a3b8; margin-left: auto; font-size: 11px; }
-        .loading { text-align: center; padding: 40px 0; color: var(--text-secondary); font-size: 14px; }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .chart-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; }
+        .chart-title { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+
+        .list-group { display: flex; flex-direction: column; gap: 10px; }
+        .item-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .item-name { font-size: 14px; font-weight: 600; }
+        .item-val { font-size: 15px; font-weight: 700; }
+        .item-sub { display: flex; gap: 8px; font-size: 12px; color: var(--text-sub); align-items: center; }
+        .badge { background: #eff6ff; color: var(--primary); font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; color: var(--text-sub); font-size: 12px; }
+        .num-col { text-align: right; }
+        .loading { text-align: center; padding: 30px 0; color: var(--text-sub); font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="content" class="loading">구글 시트에서 최신 자산 정보를 불러오는 중...</div>
+        <!-- 상단 헤더 카드 -->
+        <div class="hero-card">
+            <div class="hero-label">총 순자산</div>
+            <div class="hero-total" id="totalNetWorth">- 원</div>
+            <div class="market-pills">
+                <span class="market-pill">KOSPI <strong id="kospiVal">-</strong></span>
+                <span class="market-pill">NASDAQ <strong id="nasdaqVal">-</strong></span>
+            </div>
+        </div>
+
+        <!-- 스크롤 탭 메뉴 -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('summary')">📊 총괄 대시보드</button>
+            <button class="tab-btn" onclick="switchTab('history')">📈 자산 추이</button>
+            <button class="tab-btn" onclick="switchTab('pension')">연금&보험</button>
+            <button class="tab-btn" onclick="switchTab('irp')">퇴직연금(IRP)</button>
+            <button class="tab-btn" onclick="switchTab('isa')">ISA</button>
+            <button class="tab-btn" onclick="switchTab('domestic')">국내주식</button>
+        </div>
+
+        <!-- 1. 총괄 대시보드 -->
+        <div id="tab-summary" class="panel active">
+            <div class="chart-box">
+                <div class="chart-title">자산군 구성 비중</div>
+                <div style="max-height: 220px; display: flex; justify-content: center;">
+                    <canvas id="assetDoughnutChart"></canvas>
+                </div>
+            </div>
+            <div class="list-group" id="summaryList">
+                <div class="loading">실시간 데이터를 가져오는 중...</div>
+            </div>
+        </div>
+
+        <!-- 2. 자산 추이 -->
+        <div id="tab-history" class="panel">
+            <div class="chart-box">
+                <div class="chart-title">총 순자산 누적 추이</div>
+                <canvas id="historyLineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 3. 연금&보험 세부 -->
+        <div id="tab-pension" class="panel">
+            <div class="chart-box" style="padding: 10px; overflow-x: auto;">
+                <div class="chart-title" style="margin: 8px;">연금저축 및 보험 상세</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>상품/종목명</th>
+                            <th class="num-col">수량/상태</th>
+                            <th class="num-col">평가금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pensionTableBody">
+                        <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 4. 퇴직연금(IRP) 세부 -->
+        <div id="tab-irp" class="panel">
+            <div class="chart-box" style="padding: 10px; overflow-x: auto;">
+                <div class="chart-title" style="margin: 8px;">퇴직연금(IRP) 운용 상세</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>상품/종목명</th>
+                            <th class="num-col">수량/비중</th>
+                            <th class="num-col">평가금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="irpTableBody">
+                        <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. ISA 세부 -->
+        <div id="tab-isa" class="panel">
+            <div class="chart-box" style="padding: 10px; overflow-x: auto;">
+                <div class="chart-title" style="margin: 8px;">ISA 보유 종목 상세</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>종목명</th>
+                            <th class="num-col">수량</th>
+                            <th class="num-col">현재가</th>
+                            <th class="num-col">평가금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="isaTableBody">
+                        <tr><td colspan="4" class="loading">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 6. 국내주식 세부 -->
+        <div id="tab-domestic" class="panel">
+            <div class="chart-box" style="padding: 10px; overflow-x: auto;">
+                <div class="chart-title" style="margin: 8px;">국내주식 보유 종목 상세</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>종목명</th>
+                            <th class="num-col">수량</th>
+                            <th class="num-col">현재가</th>
+                            <th class="num-col">평가금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="domesticTableBody">
+                        <tr><td colspan="4" class="loading">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ⚠️ 여기에 1단계에서 복사한 구글 시트 웹게시 CSV 링크를 넣으세요!
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSLKJkEpa2TcmD6N1YGkjIpRN3vlL8NuWjUsaYE8VGk9rUmBTqtW_ryb6mmVrJeUFH0VALyXSxcMcG_/pub?gid=0&single=true&output=csv";
+        async function fetchSheetDataByName(sheetName) {
+            const sheetId = APP_CONFIG.SPREADSHEET_ID;
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&t=${Date.now()}`;
+            
+            const res = await fetch(url);
+            const text = await res.text();
+            
+            const jsonText = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+            const data = JSON.parse(jsonText);
+            
+            return data.table.rows.map(row => {
+                return row.c ? row.c.map(cell => (cell ? (cell.f ? cell.f : (cell.v !== null ? cell.v : "")) : "")) : [];
+            });
+        }
 
-        async function loadSheetData() {
-            try {
-                const res = await fetch(CSV_URL + "&t=" + new Date().getTime());
-                const text = await res.text();
+        function switchTab(tabId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 공통 표 렌더링 도우미 (종목명, 수량/보조, 평가금액)
+        function renderSimpleTable(rows, targetElementId) {
+            let html = "";
+            for (let i = 2; i < rows.length; i++) {
+                const r = rows[i];
+                if (!r || r.length === 0) continue;
                 
-                // 간단한 CSV 파서
-                const rows = text.split('\n').map(row => {
-                    const regex = /(?:,|\n|^)("(?:(?:"")*[^"]*)*"|[^",\n]*|(?:\n|$))/g;
-                    let matches = [];
-                    let match;
-                    while ((match = regex.exec(row)) !== null && match[0] !== "") {
-                        let val = match[1] || "";
-                        if (val.startsWith('"') && val.endsWith('"')) {
-                            val = val.slice(1, -1).replace(/""/g, '"');
-                        }
-                        matches.push(val.trim());
-                    }
-                    return matches;
-                });
+                // 보통 B열이나 C열에 상품명이 위치
+                const name = r[2] || r[1] || "";
+                if (!name || name.includes("최종합계") || name === "-") continue;
+                
+                // 수량과 평가금액 자동 매핑 (뒤쪽 열 중 숫자/금액 형식 추출)
+                const qty = r[4] || r[3] || "-";
+                const evalAmount = r[6] || r[5] || r[7] || "-";
 
-                // 2행: 총 순자산 (인덱스 1)
-                const totalNetWorth = rows[1][1] || "0";
-                const kospi = rows[1][8] || "-";
-                const nasdaq = rows[1][9] || "-";
+                html += `
+                    <tr>
+                        <td><strong>${name}</strong></td>
+                        <td class="num-col">${qty}</td>
+                        <td class="num-col">${evalAmount}</td>
+                    </tr>
+                `;
+            }
+            document.getElementById(targetElementId).innerHTML = html || '<tr><td colspan="3">데이터가 없습니다.</td></tr>';
+        }
 
-                // 3~10행: 개별 자산 카드
-                let cardsHtml = "";
+        async function initApp() {
+            try {
+                // 1. 총자산 대시보드 로드
+                const dashRows = await fetchSheetDataByName(APP_CONFIG.TABS.DASHBOARD);
+                const totalWorth = dashRows[1][1] || "0";
+                const kospi = dashRows[1][8] || "-";
+                const nasdaq = dashRows[1][9] || "-";
+                
+                document.getElementById('totalNetWorth').innerText = (typeof totalWorth === 'number' ? totalWorth.toLocaleString() : totalWorth) + " 원";
+                document.getElementById('kospiVal').innerText = kospi;
+                document.getElementById('nasdaqVal').innerText = nasdaq;
+
+                const labels = [];
+                const values = [];
+                let summaryHtml = "";
+
                 for (let i = 2; i < 10; i++) {
-                    const r = rows[i];
+                    const r = dashRows[i];
                     if (!r || !r[0]) continue;
-                    
-                    const catName = r[0];
-                    const amount = r[1] || "0";
+                    const name = r[0];
+                    const amountStr = String(r[1] || "0");
+                    const rawVal = parseInt(amountStr.replace(/[^0-9]/g, '')) || 0;
                     const weight = r[2] || "0%";
-                    const target = r[3] ? `목표: ${r[3]}` : "";
                     const note = r[6] || "";
 
-                    cardsHtml += `
-                        <div class="asset-card">
-                            <div class="card-main">
-                                <span class="category-name">${catName}</span>
-                                <span class="category-amount">${amount} 원</span>
+                    labels.push(name);
+                    values.push(rawVal);
+
+                    summaryHtml += `
+                        <div class="item-card">
+                            <div class="item-row">
+                                <span class="item-name">${name}</span>
+                                <span class="item-val">${amountStr} 원</span>
                             </div>
-                            <div class="card-sub">
-                                <span class="weight-badge">비중 ${weight}</span>
-                                <span class="target-text">${target}</span>
-                                <span class="note-text">${note}</span>
+                            <div class="item-sub">
+                                <span class="badge">${weight}</span>
+                                <span>${note}</span>
                             </div>
                         </div>
                     `;
                 }
+                document.getElementById('summaryList').innerHTML = summaryHtml;
 
-                const now = new Date();
-                const timeString = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                // 도넛 차트
+                new Chart(document.getElementById('assetDoughnutChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#64748b', '#14b8a6']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+                });
 
-                document.getElementById("content").innerHTML = `
-                    <div class="hero-card">
-                        <div class="hero-label">총 순자산</div>
-                        <div class="hero-total">${totalNetWorth} 원</div>
-                        <div class="market-pills">
-                            <span class="market-pill">KOSPI <strong>${kospi}</strong></span>
-                            <span class="market-pill">NASDAQ <strong>${nasdaq}</strong></span>
-                        </div>
-                    </div>
+                // 2. 연금&보험 로드
+                try {
+                    const pensionRows = await fetchSheetDataByName(APP_CONFIG.TABS.PENSION);
+                    renderSimpleTable(pensionRows, 'pensionTableBody');
+                } catch(e) { console.warn("연금&보험 로드 실패", e); }
 
-                    <div class="section-header">
-                        <span class="section-title">자산별 구성</span>
-                        <span class="sync-time">실시간 갱신: ${timeString}</span>
-                    </div>
+                // 3. 퇴직연금(IRP) 로드
+                try {
+                    const irpRows = await fetchSheetDataByName(APP_CONFIG.TABS.IRP);
+                    renderSimpleTable(irpRows, 'irpTableBody');
+                } catch(e) { console.warn("IRP 로드 실패", e); }
 
-                    <div class="asset-list">
-                        ${cardsHtml}
-                    </div>
-                `;
+                // 4. ISA 로드
+                try {
+                    const isaRows = await fetchSheetDataByName(APP_CONFIG.TABS.ISA);
+                    let isaHtml = "";
+                    for (let i = 2; i < isaRows.length; i++) {
+                        const r = isaRows[i];
+                        if (!r || !r[2]) continue;
+                        isaHtml += `
+                            <tr>
+                                <td><strong>${r[2]}</strong></td>
+                                <td class="num-col">${r[4]}</td>
+                                <td class="num-col">${r[5]}</td>
+                                <td class="num-col">${r[6]}</td>
+                            </tr>
+                        `;
+                    }
+                    document.getElementById('isaTableBody').innerHTML = isaHtml || '<tr><td colspan="4">데이터가 없습니다.</td></tr>';
+                } catch(e) { console.warn("ISA 로드 실패", e); }
+
+                // 5. 국내주식 로드
+                try {
+                    const domRows = await fetchSheetDataByName(APP_CONFIG.TABS.DOMESTIC);
+                    let domHtml = "";
+                    for (let i = 2; i < domRows.length; i++) {
+                        const r = domRows[i];
+                        if (!r || !r[2]) continue;
+                        domHtml += `
+                            <tr>
+                                <td><strong>${r[2]}</strong></td>
+                                <td class="num-col">${r[4]}</td>
+                                <td class="num-col">${r[5]}</td>
+                                <td class="num-col">${r[6]}</td>
+                            </tr>
+                        `;
+                    }
+                    document.getElementById('domesticTableBody').innerHTML = domHtml || '<tr><td colspan="4">데이터가 없습니다.</td></tr>';
+                } catch(e) { console.warn("국내주식 로드 실패", e); }
+
+                // 6. 자산 누적 추이 차트 로드
+                try {
+                    const hisRows = await fetchSheetDataByName(APP_CONFIG.TABS.HISTORY);
+                    const dates = [];
+                    const historyTotals = [];
+                    for (let i = 1; i < hisRows.length; i++) {
+                        const r = hisRows[i];
+                        if (!r || !r[0]) continue;
+                        dates.push(r[0]);
+                        const val = parseInt(String(r[1] || "0").replace(/[^0-9]/g, '')) || 0;
+                        historyTotals.push(val);
+                    }
+
+                    if (dates.length > 0) {
+                        new Chart(document.getElementById('historyLineChart'), {
+                            type: 'line',
+                            data: {
+                                labels: dates,
+                                datasets: [{
+                                    label: '총 순자산',
+                                    data: historyTotals,
+                                    borderColor: '#2563eb',
+                                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                    fill: true,
+                                    tension: 0.3
+                                }]
+                            },
+                            options: { responsive: true, plugins: { legend: { display: false } } }
+                        });
+                    }
+                } catch(e) { console.warn("기록 탭 로드 실패", e); }
+
             } catch (err) {
-                document.getElementById("content").innerHTML = `
-                    <div style="color: red; text-align: center; padding: 20px;">
-                        데이터를 불러오지 못했습니다.<br>구글 시트 CSV 링크를 확인해 주세요.
-                    </div>
-                `;
+                console.error("전체 초기화 실패:", err);
+                document.getElementById('summaryList').innerHTML = `<div style="color:red; text-align:center;">시트 ID를 확인해주세요. (시트 공유 설정: 링크가 있는 모든 사용자-뷰어)</div>`;
             }
         }
 
-        loadSheetData();
+        window.onload = initApp;
     </script>
 </body>
 </html>
