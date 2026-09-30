@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>통합 자산 관리 대시보드</title>
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- ⚙️ 분리된 설정 파일 -->
     <script src="config.js"></script>
     <style>
         :root {
@@ -71,7 +69,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- 상단 헤더 카드 -->
+        <!-- 총 순자산 & 시장 지수 헤더 -->
         <div class="hero-card">
             <div class="hero-label">총 순자산</div>
             <div class="hero-total" id="totalNetWorth">- 원</div>
@@ -85,10 +83,11 @@
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('summary')">📊 총괄 대시보드</button>
             <button class="tab-btn" onclick="switchTab('history')">📈 자산 추이</button>
+            <button class="tab-btn" onclick="switchTab('overseas')">해외주식</button>
+            <button class="tab-btn" onclick="switchTab('domestic')">국내주식</button>
+            <button class="tab-btn" onclick="switchTab('isa')">ISA</button>
             <button class="tab-btn" onclick="switchTab('pension')">연금&보험</button>
             <button class="tab-btn" onclick="switchTab('irp')">퇴직연금(IRP)</button>
-            <button class="tab-btn" onclick="switchTab('isa')">ISA</button>
-            <button class="tab-btn" onclick="switchTab('domestic')">국내주식</button>
         </div>
 
         <!-- 1. 총괄 대시보드 -->
@@ -112,38 +111,38 @@
             </div>
         </div>
 
-        <!-- 3. 연금&보험 세부 -->
-        <div id="tab-pension" class="panel">
+        <!-- 3. 해외주식 세부 -->
+        <div id="tab-overseas" class="panel">
             <div class="chart-box" style="padding: 10px; overflow-x: auto;">
-                <div class="chart-title" style="margin: 8px;">연금저축 및 보험 상세</div>
+                <div class="chart-title" style="margin: 8px;">해외주식 보유 종목 상세</div>
                 <table>
                     <thead>
                         <tr>
-                            <th>상품/종목명</th>
-                            <th class="num-col">수량/상태</th>
+                            <th>종목명</th>
+                            <th class="num-col">수량</th>
                             <th class="num-col">평가금액</th>
                         </tr>
                     </thead>
-                    <tbody id="pensionTableBody">
+                    <tbody id="overseasTableBody">
                         <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 4. 퇴직연금(IRP) 세부 -->
-        <div id="tab-irp" class="panel">
+        <!-- 4. 국내주식 세부 -->
+        <div id="tab-domestic" class="panel">
             <div class="chart-box" style="padding: 10px; overflow-x: auto;">
-                <div class="chart-title" style="margin: 8px;">퇴직연금(IRP) 운용 상세</div>
+                <div class="chart-title" style="margin: 8px;">국내주식 보유 종목 상세</div>
                 <table>
                     <thead>
                         <tr>
-                            <th>상품/종목명</th>
-                            <th class="num-col">수량/비중</th>
+                            <th>종목명</th>
+                            <th class="num-col">수량</th>
                             <th class="num-col">평가금액</th>
                         </tr>
                     </thead>
-                    <tbody id="irpTableBody">
+                    <tbody id="domesticTableBody">
                         <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
                     </tbody>
                 </table>
@@ -159,32 +158,49 @@
                         <tr>
                             <th>종목명</th>
                             <th class="num-col">수량</th>
-                            <th class="num-col">현재가</th>
                             <th class="num-col">평가금액</th>
                         </tr>
                     </thead>
                     <tbody id="isaTableBody">
-                        <tr><td colspan="4" class="loading">불러오는 중...</td></tr>
+                        <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 6. 국내주식 세부 -->
-        <div id="tab-domestic" class="panel">
+        <!-- 6. 연금&보험 세부 -->
+        <div id="tab-pension" class="panel">
             <div class="chart-box" style="padding: 10px; overflow-x: auto;">
-                <div class="chart-title" style="margin: 8px;">국내주식 보유 종목 상세</div>
+                <div class="chart-title" style="margin: 8px;">연금저축 및 보험 상세</div>
                 <table>
                     <thead>
                         <tr>
-                            <th>종목명</th>
-                            <th class="num-col">수량</th>
-                            <th class="num-col">현재가</th>
+                            <th>상품/종목명</th>
+                            <th class="num-col">수량/구분</th>
                             <th class="num-col">평가금액</th>
                         </tr>
                     </thead>
-                    <tbody id="domesticTableBody">
-                        <tr><td colspan="4" class="loading">불러오는 중...</td></tr>
+                    <tbody id="pensionTableBody">
+                        <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 7. 퇴직연금(IRP) 세부 -->
+        <div id="tab-irp" class="panel">
+            <div class="chart-box" style="padding: 10px; overflow-x: auto;">
+                <div class="chart-title" style="margin: 8px;">퇴직연금(IRP) 운용 상세</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>상품/종목명</th>
+                            <th class="num-col">수량/구분</th>
+                            <th class="num-col">평가금액</th>
+                        </tr>
+                    </thead>
+                    <tbody id="irpTableBody">
+                        <tr><td colspan="3" class="loading">불러오는 중...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -214,20 +230,55 @@
             event.target.classList.add('active');
         }
 
-        // 공통 표 렌더링 도우미 (종목명, 수량/보조, 평가금액)
-        function renderSimpleTable(rows, targetElementId) {
+        // 각 탭의 상이한 열 구조를 유연하게 파악하여 테이블을 생성하는 스마트 렌더러
+        function renderSmartTable(rows, targetElementId) {
             let html = "";
-            for (let i = 2; i < rows.length; i++) {
+            for (let i = 1; i < rows.length; i++) {
                 const r = rows[i];
                 if (!r || r.length === 0) continue;
                 
-                // 보통 B열이나 C열에 상품명이 위치
-                const name = r[2] || r[1] || "";
-                if (!name || name.includes("최종합계") || name === "-") continue;
-                
-                // 수량과 평가금액 자동 매핑 (뒤쪽 열 중 숫자/금액 형식 추출)
-                const qty = r[4] || r[3] || "-";
-                const evalAmount = r[6] || r[5] || r[7] || "-";
+                // 1. 행 안에서 의미 있는 텍스트(종목명) 찾기
+                let name = "";
+                let qty = "-";
+                let evalAmount = "-";
+
+                // 빈 문자열이 아닌 칸들 수집
+                const validCells = [];
+                r.forEach((cell, idx) => {
+                    const str = String(cell).trim();
+                    if (str && str !== "-" && !str.includes("최종합계") && !str.includes("★")) {
+                        validCells.push({ text: str, colIndex: idx });
+                    }
+                });
+
+                if (validCells.length === 0) continue;
+
+                // 헤더 행 건너뛰기
+                if (validCells.some(c => c.text === "종목명" || c.text === "종목코드" || c.text === "상품명")) {
+                    continue;
+                }
+
+                // 2. 숫자가 아닌 가장 긴 한글/영문 텍스트를 종목명으로 판단
+                const textCandidates = validCells.filter(c => isNaN(c.text.replace(/,/g, '')) && !c.text.startsWith("KRX:"));
+                if (textCandidates.length > 0) {
+                    // 가장 구체적인 이름(길이가 적당히 긴 것)
+                    name = textCandidates.reduce((a, b) => a.text.length >= b.text.length ? a : b).text;
+                } else {
+                    name = validCells[0].text;
+                }
+
+                // 3. 금액/숫자 형태(콤마 포함 숫자) 추출
+                const numberCandidates = validCells.filter(c => {
+                    const clean = c.text.replace(/,/g, '').replace(/원/g, '').trim();
+                    return !isNaN(clean) && clean !== "";
+                });
+
+                if (numberCandidates.length >= 2) {
+                    qty = numberCandidates[0].text;
+                    evalAmount = numberCandidates[numberCandidates.length - 1].text;
+                } else if (numberCandidates.length === 1) {
+                    evalAmount = numberCandidates[0].text;
+                }
 
                 html += `
                     <tr>
@@ -242,16 +293,34 @@
 
         async function initApp() {
             try {
-                // 1. 총자산 대시보드 로드
+                // 1. 대시보드 탭 로드
                 const dashRows = await fetchSheetDataByName(APP_CONFIG.TABS.DASHBOARD);
-                const totalWorth = dashRows[1][1] || "0";
-                const kospi = dashRows[1][8] || "-";
-                const nasdaq = dashRows[1][9] || "-";
                 
+                // 총 순자산
+                const totalWorth = dashRows[1][1] || "0";
                 document.getElementById('totalNetWorth').innerText = (typeof totalWorth === 'number' ? totalWorth.toLocaleString() : totalWorth) + " 원";
-                document.getElementById('kospiVal').innerText = kospi;
-                document.getElementById('nasdaqVal').innerText = nasdaq;
 
+                // KOSPI / NASDAQ 위치 동적 탐색 (1~3행 전체 스캔)
+                let kospi = "-";
+                let nasdaq = "-";
+                for (let r = 0; r < Math.min(3, dashRows.length); r++) {
+                    dashRows[r].forEach((cell, cIdx) => {
+                        const cellStr = String(cell).toUpperCase();
+                        if (cellStr.includes("KOSPI")) {
+                            // 바로 다음 행 또는 같은 행 우측 값 확인
+                            kospi = dashRows[r+1] ? dashRows[r+1][cIdx] : "-";
+                            if (!kospi || kospi === "-") kospi = dashRows[r][cIdx+1] || "-";
+                        }
+                        if (cellStr.includes("NASDAQ")) {
+                            nasdaq = dashRows[r+1] ? dashRows[r+1][cIdx] : "-";
+                            if (!nasdaq || nasdaq === "-") nasdaq = dashRows[r][cIdx+1] || "-";
+                        }
+                    });
+                }
+                document.getElementById('kospiVal').innerText = kospi || "-";
+                document.getElementById('nasdaqVal').innerText = nasdaq || "-";
+
+                // 대시보드 자산 목록 및 도넛차트
                 const labels = [];
                 const values = [];
                 let summaryHtml = "";
@@ -283,7 +352,6 @@
                 }
                 document.getElementById('summaryList').innerHTML = summaryHtml;
 
-                // 도넛 차트
                 new Chart(document.getElementById('assetDoughnutChart'), {
                     type: 'doughnut',
                     data: {
@@ -296,91 +364,82 @@
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
                 });
 
-                // 2. 연금&보험 로드
-                try {
-                    const pensionRows = await fetchSheetDataByName(APP_CONFIG.TABS.PENSION);
-                    renderSimpleTable(pensionRows, 'pensionTableBody');
-                } catch(e) { console.warn("연금&보험 로드 실패", e); }
+                // 2. 해외주식 렌더링
+                if (APP_CONFIG.TABS.OVERSEAS) {
+                    try {
+                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.OVERSEAS);
+                        renderSmartTable(rows, 'overseasTableBody');
+                    } catch(e) { console.warn("해외주식 로드 실패", e); }
+                }
 
-                // 3. 퇴직연금(IRP) 로드
-                try {
-                    const irpRows = await fetchSheetDataByName(APP_CONFIG.TABS.IRP);
-                    renderSimpleTable(irpRows, 'irpTableBody');
-                } catch(e) { console.warn("IRP 로드 실패", e); }
+                // 3. 국내주식 렌더링
+                if (APP_CONFIG.TABS.DOMESTIC) {
+                    try {
+                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.DOMESTIC);
+                        renderSmartTable(rows, 'domesticTableBody');
+                    } catch(e) { console.warn("국내주식 로드 실패", e); }
+                }
 
-                // 4. ISA 로드
-                try {
-                    const isaRows = await fetchSheetDataByName(APP_CONFIG.TABS.ISA);
-                    let isaHtml = "";
-                    for (let i = 2; i < isaRows.length; i++) {
-                        const r = isaRows[i];
-                        if (!r || !r[2]) continue;
-                        isaHtml += `
-                            <tr>
-                                <td><strong>${r[2]}</strong></td>
-                                <td class="num-col">${r[4]}</td>
-                                <td class="num-col">${r[5]}</td>
-                                <td class="num-col">${r[6]}</td>
-                            </tr>
-                        `;
-                    }
-                    document.getElementById('isaTableBody').innerHTML = isaHtml || '<tr><td colspan="4">데이터가 없습니다.</td></tr>';
-                } catch(e) { console.warn("ISA 로드 실패", e); }
+                // 4. ISA 렌더링
+                if (APP_CONFIG.TABS.ISA) {
+                    try {
+                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.ISA);
+                        renderSmartTable(rows, 'isaTableBody');
+                    } catch(e) { console.warn("ISA 로드 실패", e); }
+                }
 
-                // 5. 국내주식 로드
-                try {
-                    const domRows = await fetchSheetDataByName(APP_CONFIG.TABS.DOMESTIC);
-                    let domHtml = "";
-                    for (let i = 2; i < domRows.length; i++) {
-                        const r = domRows[i];
-                        if (!r || !r[2]) continue;
-                        domHtml += `
-                            <tr>
-                                <td><strong>${r[2]}</strong></td>
-                                <td class="num-col">${r[4]}</td>
-                                <td class="num-col">${r[5]}</td>
-                                <td class="num-col">${r[6]}</td>
-                            </tr>
-                        `;
-                    }
-                    document.getElementById('domesticTableBody').innerHTML = domHtml || '<tr><td colspan="4">데이터가 없습니다.</td></tr>';
-                } catch(e) { console.warn("국내주식 로드 실패", e); }
+                // 5. 연금&보험 렌더링
+                if (APP_CONFIG.TABS.PENSION) {
+                    try {
+                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.PENSION);
+                        renderSmartTable(rows, 'pensionTableBody');
+                    } catch(e) { console.warn("연금&보험 로드 실패", e); }
+                }
 
-                // 6. 자산 누적 추이 차트 로드
-                try {
-                    const hisRows = await fetchSheetDataByName(APP_CONFIG.TABS.HISTORY);
-                    const dates = [];
-                    const historyTotals = [];
-                    for (let i = 1; i < hisRows.length; i++) {
-                        const r = hisRows[i];
-                        if (!r || !r[0]) continue;
-                        dates.push(r[0]);
-                        const val = parseInt(String(r[1] || "0").replace(/[^0-9]/g, '')) || 0;
-                        historyTotals.push(val);
-                    }
+                // 6. 퇴직연금(IRP) 렌더링
+                if (APP_CONFIG.TABS.IRP) {
+                    try {
+                        const rows = await fetchSheetDataByName(APP_CONFIG.TABS.IRP);
+                        renderSmartTable(rows, 'irpTableBody');
+                    } catch(e) { console.warn("IRP 로드 실패", e); }
+                }
 
-                    if (dates.length > 0) {
-                        new Chart(document.getElementById('historyLineChart'), {
-                            type: 'line',
-                            data: {
-                                labels: dates,
-                                datasets: [{
-                                    label: '총 순자산',
-                                    data: historyTotals,
-                                    borderColor: '#2563eb',
-                                    backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                                    fill: true,
-                                    tension: 0.3
-                                }]
-                            },
-                            options: { responsive: true, plugins: { legend: { display: false } } }
-                        });
-                    }
-                } catch(e) { console.warn("기록 탭 로드 실패", e); }
+                // 7. 누적 추이 차트
+                if (APP_CONFIG.TABS.HISTORY) {
+                    try {
+                        const hisRows = await fetchSheetDataByName(APP_CONFIG.TABS.HISTORY);
+                        const dates = [];
+                        const historyTotals = [];
+                        for (let i = 1; i < hisRows.length; i++) {
+                            const r = hisRows[i];
+                            if (!r || !r[0]) continue;
+                            dates.push(r[0]);
+                            const val = parseInt(String(r[1] || "0").replace(/[^0-9]/g, '')) || 0;
+                            historyTotals.push(val);
+                        }
+
+                        if (dates.length > 0) {
+                            new Chart(document.getElementById('historyLineChart'), {
+                                type: 'line',
+                                data: {
+                                    labels: dates,
+                                    datasets: [{
+                                        label: '총 순자산',
+                                        data: historyTotals,
+                                        borderColor: '#2563eb',
+                                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                        fill: true,
+                                        tension: 0.3
+                                    }]
+                                },
+                                options: { responsive: true, plugins: { legend: { display: false } } }
+                            });
+                        }
+                    } catch(e) { console.warn("기록 로드 실패", e); }
+                }
 
             } catch (err) {
-                console.error("전체 초기화 실패:", err);
-                document.getElementById('summaryList').innerHTML = `<div style="color:red; text-align:center;">시트 ID를 확인해주세요. (시트 공유 설정: 링크가 있는 모든 사용자-뷰어)</div>`;
+                console.error("초기화 실패:", err);
             }
         }
 
