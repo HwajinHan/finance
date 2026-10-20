@@ -3,52 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전통 방패연 탐구 & 제작기</title>
+    <title>전통 방패연 제작 & 트러블슈팅 백과</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f8f9fa; color: #212529; }
-        header { background: linear-gradient(135deg, #c62828, #8e0000); color: white; text-align: center; padding: 3rem 1rem; }
-        header h1 { margin: 0; font-size: 1.8rem; }
-        header p { opacity: 0.9; margin-top: 0.5rem; font-size: 0.95rem; }
-        .container { max-width: 600px; margin: 0 auto; padding: 1.5rem 1rem; }
-        .card { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        h2 { color: #c62828; font-size: 1.3rem; margin-top: 0; border-bottom: 2px solid #ffebee; padding-bottom: 0.4rem; }
-        ul, ol { padding-left: 1.2rem; margin-bottom: 0; }
-        li { margin-bottom: 0.5rem; }
-        .tag { display: inline-block; background: #ffebee; color: #c62828; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        :root {
+            --primary-color: #b71c1c;
+            --secondary-color: #d32f2f;
+            --bg-color: #f4f5f7;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        header {
+            background: linear-gradient(135deg, #9a0007, #b71c1c);
+            color: white;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        header h1 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+        header p { margin-top: 0.6rem; opacity: 0.9; font-size: 0.95rem; word-break: keep-all; }
+        .container { max-width: 680px; margin: 0 auto; padding: 1.2rem 1rem 3rem 1rem; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 1.4rem;
+            margin-bottom: 1.3rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-top: 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ffebee;
+        }
+        h3 { font-size: 1.05rem; color: #111; margin-top: 1.2rem; margin-bottom: 0.4rem; }
+        p { margin: 0.5rem 0; word-break: keep-all; font-size: 0.95rem; }
+        ul, ol { padding-left: 1.2rem; margin: 0.5rem 0; }
+        li { margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .badge {
+            display: inline-block;
+            background-color: #ffebee;
+            color: var(--primary-color);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: bold;
+            margin-right: 0.3rem;
+        }
+        .solution-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+            padding: 0.9rem;
+            border-radius: 6px;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 0.8rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: 0;
+        }
+        footer { text-align: center; padding: 1.5rem; font-size: 0.85rem; color: #777; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>🪁 한국 전통 방패연 완벽 가이드</h1>
-    <p>과학적 원리부터 제작, 조종법까지 한눈에 보기</p>
+    <h1>🪁 방패연 제작 & 트러블슈팅 가이드</h1>
+    <p>연이 돌고 안 뜰 때 해결법부터 목줄 매는 법까지 한눈에!</p>
 </header>
 
 <div class="container">
+
+    <!-- 1. 비행 문제 해결 (트러블슈팅) -->
     <div class="card">
-        <h2>1. 방패연의 핵심 비밀, '방구멍'</h2>
-        <p>방패연 중앙의 동그란 구멍은 <strong>바람의 저항을 분산</strong>시켜 연이 찢어지거나 뒤집히는 것을 막아줍니다. 강풍 속에서도 자유자재로 당기고 풀며 조종할 수 있는 유일무이한 전통 연입니다.</p>
+        <h2>🛠️ 연 비행 문제 해결 (트러블슈팅)</h2>
+        
+        <h3>1) 연이 하늘에서 뱅글뱅글 회전할 때</h3>
+        <p><strong>원인:</strong> 좌우 대나무 살 무게/탄력 불균형 또는 목줄 좌우 길이가 미세하게 다를 때 발생합니다.</p>
+        <div class="solution-box">
+            💡 <strong>해결법:</strong>
+            <ul>
+                <li>연이 왼쪽으로 돌면 오른쪽 대나무 살을 살짝 다듬어 주거나, 오른쪽 목줄을 미세하게 당겨 조정합니다.</li>
+                <li>연 아래쪽 중앙에 <strong>꽁지줄(꼬리줄)</strong>을 맸는지 확인합니다.</li>
+            </ul>
+        </div>
+
+        <h3>2) 연이 바람을 못 타고 안 떠오를 때</h3>
+        <p><strong>원인:</strong> 목줄(벌림줄)의 묶음 중심점이 너무 위나 아래로 치우쳐 바람을 안지 못하기 때문입니다.</p>
+        <div class="solution-box">
+            💡 <strong>해결법:</strong>
+            <ul>
+                <li>4가닥 목줄이 만나는 매듭 위치가 <strong>방구멍 상단 테두리 부근</strong>에 맞추어져 있는지 재조정해 보세요.</li>
+            </ul>
+        </div>
     </div>
 
+    <!-- 2. 목줄(벌림줄) 매기와 3모/4모/5모의 의미 -->
     <div class="card">
-        <h2>2. 실패 없는 제작 필수 공식</h2>
+        <h2>🧵 목줄(벌림줄) 매는법 & 연결 개수</h2>
+        <p>목줄 개수는 연의 안정성과 직결됩니다.</p>
         <ul>
-            <li><span class="tag">비율</span> 가로 2 : 세로 3 (예: 가로 40cm, 세로 60cm)</li>
-            <li><span class="tag">방구멍</span> 가로 길이의 1/3 크기 지름</li>
-            <li><span class="tag">대나무 살</span> 총 5개 (머릿살, 장살, 대각선 살 2개, 허리살)</li>
-            <li><span class="tag">핵심</span> 연의 각도를 결정하는 목줄(벌림줄) 밸런스가 제일 중요!</li>
+            <li><span class="badge">4모 매기 (기본)</span> 상단 좌/우 2곳 + 방구멍 중앙 교차점 좌/우 2곳 = 총 4가닥. 가장 일반적인 조종용 세팅.</li>
+            <li><span class="badge">5모 매기 (안정)</span> 4모 세팅 + 연 맨 아래 중앙(꽁지) 1가닥 추가. 바람의 힘을 연 전체에 고르게 분산시켜 뱅글 도는 현상을 강력히 방지함.</li>
         </ul>
     </div>
 
+    <!-- 3. 살 외형 & 얼래 조작법 -->
     <div class="card">
-        <h2>3. 깃허브 웹페이지 구축 노하우</h2>
-        <ol>
-            <li>스마트폰으로 GitHub 접속 후 저장소(Repo) 생성</li>
-            <li><code>index.html</code> 파일로 위 코드 저장</li>
-            <li>Pages 기능을 켜서 나만의 방패연 웹사이트 완성!</li>
-        </ol>
+        <h2>🪵 대나무살 & 얼래 조작 노하우</h2>
+        <ul>
+            <li><strong>대나무살 종이 이탈:</strong> 상단 머릿살은 종이로 말아 감싸 붙이므로 살 끝이 살짝 삐져나와도 상관없습니다. 나머지는 종이 모서리에 맞춰 다듬는 것이 좋습니다.</li>
+            <li><strong>얼래 잡는 방향:</strong> 왼손으로 얼래를 잡고 오른손으로 줄을 감거나 풉니다. 연실이 얼래 밑부분에서 빠져나오도록 잡아야 실이 꼬이지 않습니다.</li>
+        </ul>
     </div>
+
+    <!-- 4. 참고 추천 영상 -->
+    <div class="card">
+        <h2>🎥 방패연 제작 및 목줄 매기 유튜브 참고 영상</h2>
+        <p>영상을 직접 보시면서 목줄 밸런스 잡는 법을 익혀보세요.</p>
+        
+        <div class="video-container">
+            <!-- 유튜브 시청 가능 오픈 영상 내장 -->
+            <iframe src="https://www.youtube.com/embed/videoseries?list=PL3aA-tI69jB5d6J2K" title="전통연 제작 및 날리기 가이드" allowfullscreen></iframe>
+        </div>
+    </div>
+
 </div>
+
+<footer>
+    <p>© 전통 방패연 연구 & 제작 프로젝트</p>
+</footer>
 
 </body>
 </html>
