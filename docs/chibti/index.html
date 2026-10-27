@@ -1,0 +1,606 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>치이카와 캐릭터 성격 유형 테스트</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Cute Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Gaegu & Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        gaegu: ['Gaegu', 'cursive'],
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        chiikawaPink: '#FFEDF3',
+                        chiikawaPinkDark: '#FF94B9',
+                        chiikawaBlue: '#E8F5FF',
+                        chiikawaBlueDark: '#60A5FA',
+                        chiikawaYellow: '#FFFDE8',
+                        chiikawaYellowDark: '#FBBF24',
+                        pastelBorder: '#FBCFE8',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FFF9FA;
+            font-family: 'Noto Sans KR', sans-serif;
+            background-image: radial-gradient(#FDE2E4 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .cute-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 3px solid #FBCFE8;
+            box-shadow: 0 10px 25px -5px rgba(255, 182, 193, 0.3);
+        }
+        .cute-btn {
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #FBCFE8;
+        }
+        .cute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 148, 185, 0.4);
+        }
+        .cute-btn:active {
+            transform: translateY(0);
+        }
+        .progress-bar-fill {
+            transition: width 0.4s ease-out;
+        }
+        /* Fade animation */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 flex flex-col justify-between items-center p-4 sm:p-6">
+
+    <!-- Header Section -->
+    <header class="w-full max-w-lg text-center my-4">
+        <div class="inline-block bg-white px-4 py-1 rounded-full border-2 border-pink-200 text-pink-500 text-sm font-bold shadow-sm mb-2">
+            ✨ 먼작귀 (치이카와) 성격 테스트 ✨
+        </div>
+        <h1 class="font-gaegu text-4xl sm:text-5xl font-bold text-pink-500 drop-shadow-sm">나와 닮은 캐릭터는?</h1>
+    </header>
+
+    <!-- Main Content Box -->
+    <main class="w-full max-w-lg my-auto">
+        
+        <!-- ================================================================= -->
+        <!-- 1. START SCREEN -->
+        <!-- ================================================================= -->
+        <div id="start-screen" class="cute-card rounded-3xl p-6 sm:p-8 text-center fade-in">
+            <div class="w-32 h-32 mx-auto mb-6 rounded-full bg-pink-100 flex items-center justify-center border-4 border-pink-200 shadow-inner overflow-hidden">
+                <span class="text-6xl">🍡</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">나는 어떤 치이카와 친구일까?</h2>
+            <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                몇 가지 상황 질문을 통해 나와 가장 유사한 성격을 가진 치이카와 캐릭터를 찾아보세요! 각 답변에 따라 점수가 다르게 부여됩니다.
+            </p>
+            <button onclick="quizApp.startQuiz()" class="cute-btn w-full py-4 bg-pink-400 hover:bg-pink-500 text-white font-bold rounded-2xl text-lg shadow-lg">
+                테스트 시작하기 <i class="fa-solid fa-heart ml-2"></i>
+            </button>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- 2. QUESTION SCREEN -->
+        <!-- ================================================================= -->
+        <div id="quiz-screen" class="cute-card rounded-3xl p-6 sm:p-8 hidden">
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span id="question-number" class="text-xs sm:text-sm font-bold text-pink-500 bg-pink-100 px-3 py-1 rounded-full">
+                        Question 1 / 10
+                    </span>
+                    <span id="progress-percent" class="text-xs font-bold text-gray-400">10%</span>
+                </div>
+                <div class="w-full bg-gray-100 h-3 rounded-full overflow-hidden p-0.5 border border-pink-100">
+                    <div id="progress-bar" class="progress-bar-fill bg-gradient-to-r from-pink-300 to-pink-400 h-full rounded-full w-0"></div>
+                </div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="min-h-[90px] flex items-center justify-center mb-6">
+                <h3 id="question-text" class="text-lg sm:text-xl font-bold text-gray-800 text-center leading-relaxed">
+                    질문 내용이 여기에 들어갑니다.
+                </h3>
+            </div>
+
+            <!-- Choice Options Container -->
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamic JavaScript Choice Buttons insertion -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center pt-2">
+                <button id="prev-btn" onclick="quizApp.prevQuestion()" class="px-4 py-2 text-sm text-gray-500 hover:text-pink-500 font-medium disabled:opacity-30 disabled:hover:text-gray-500 flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i> 이전 질문
+                </button>
+                <span class="text-xs text-gray-400 font-medium">선택시 자동으로 이동합니다</span>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- 3. RESULT SCREEN -->
+        <!-- ================================================================= -->
+        <div id="result-screen" class="cute-card rounded-3xl p-6 sm:p-8 hidden fade-in">
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold text-pink-500 bg-pink-100 px-3 py-1 rounded-full uppercase tracking-wider">
+                    테스트 결과
+                </span>
+                <h2 id="result-title" class="text-2xl sm:text-3xl font-bold text-gray-800 mt-3">
+                    당신은 <span id="top-character-name" class="text-pink-500"></span> 입니다!
+                </h2>
+            </div>
+
+            <!-- Result Character Card -->
+            <div id="result-card" class="p-6 rounded-2xl mb-6 text-center border-2 transition-all">
+                <div id="character-emoji" class="text-7xl mb-3 transform hover:scale-110 transition-transform cursor-pointer"></div>
+                <div id="character-quote" class="italic text-sm text-gray-600 mb-3 bg-white/70 py-2 px-4 rounded-xl inline-block border border-gray-100"></div>
+                <p id="character-desc" class="text-sm text-gray-700 leading-relaxed text-left"></p>
+            </div>
+
+            <!-- Detailed Score Distribution -->
+            <div class="mb-6">
+                <h4 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-pink-400"></i> 내 안의 캐릭터 성향 비율
+                </h4>
+                <div id="breakdown-list" class="space-y-2.5">
+                    <!-- Progress bars for each character -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <button onclick="quizApp.restartQuiz()" class="cute-btn w-full py-3.5 bg-pink-400 hover:bg-pink-500 text-white font-bold rounded-xl shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> 다시 테스트하기
+                </button>
+                <button onclick="quizApp.copyShareUrl()" class="cute-btn w-full py-3.5 bg-white hover:bg-pink-50 text-pink-500 font-bold rounded-xl flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-share-nodes"></i> 결과 공유하기
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-lg text-center mt-6 text-xs text-gray-400">
+        <p>© 2026 Chiikawa Character Personality Test. All rights reserved.</p>
+    </footer>
+
+    <!-- Toast Notification Message -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-5 py-2.5 rounded-full text-xs font-bold opacity-0 transition-opacity pointer-events-none shadow-lg z-50">
+        클립보드에 복사되었습니다!
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- DATA SECTION: Non-technical users can freely edit questions below -->
+    <!-- ================================================================= -->
+    <script>
+        /**
+         * [치이카와 성격 테스트 데이터 관리]
+         * 
+         * 1. 캐릭터 목록 (characterMetadata):
+         *    - chiikawa (치이카와), hachiware (하치와레), usagi (우사기), 
+         *      kurimanju (쿠리만쥬), momonga (모몽가), rakko (라코), shisa (시사)
+         * 
+         * 2. 질문 추가하는 방법 (questionsData):
+         *    질문 배열(`questionsData`)에 새로운 객체를 추가하세요.
+         * 
+         *    예시:
+         *    {
+         *        id: 11,
+         *        question: "새로운 질문 내용을 여기에 입력하세요",
+         *        options: [
+         *            {
+         *                text: "선택지 A 내용",
+         *                scores: { chiikawa: 3, hachiware: 1 } // 원하는 캐릭터에 점수 부여 (+1 ~ +5)
+         *            },
+         *            {
+         *                text: "선택지 B 내용",
+         *                scores: { usagi: 5, momonga: 2 }
+         *            }
+         *        ]
+         *    }
+         */
+
+        const characterMetadata = {
+            chiikawa: {
+                id: "chiikawa",
+                name: "치이카와",
+                emoji: "🥹",
+                color: "bg-pink-50 border-pink-200 text-pink-700",
+                barColor: "bg-pink-400",
+                quote: "“으... 응...! (와하...!)”",
+                description: "겁도 많고 눈물도 많지만, 친구들을 위해 용기를 낼 줄 아는 상냥한 성격입니다. 조용하고 신중하며 주변 사람들의 매개체 역할을 합니다. 작은 것에도 크게 감동하는 순수한 마음의 소유자입니다."
+            },
+            hachiware: {
+                id: "hachiware",
+                name: "하치와레",
+                emoji: "🐱",
+                color: "bg-blue-50 border-blue-200 text-blue-700",
+                barColor: "bg-blue-400",
+                quote: "“어떻게든 될 거야! (나도 그렇게 생각해!)”",
+                description: "밝고 사교적이며 긍정적인 에너지가 넘칩니다! 어떠한 곤경에 처해도 '어떻게든 될 거야!'라는 마인드로 헤쳐나갑니다. 친구들을 살뜰히 챙기고 다정한 어휘 선택을 잘합니다."
+            },
+            usagi: {
+                id: "usagi",
+                name: "우사기",
+                emoji: "🐰",
+                color: "bg-amber-50 border-amber-200 text-amber-700",
+                barColor: "bg-amber-400",
+                quote: "“우라!! 야하!! 푸룰룰룰루!!”",
+                description: "자유로운 영혼의 소유자! 남의 눈치를 전혀 보지 않으며 예측 불가능한 행동으로 주변을 놀라게 합니다. 하지만 사실 능력치가 높고 자유분방함 뒤에 강한 생존력과 실력을 숨기고 있습니다."
+            },
+            kurimanju: {
+                id: "kurimanju",
+                name: "쿠리만쥬",
+                emoji: "🌰",
+                color: "bg-orange-50 border-orange-200 text-orange-700",
+                barColor: "bg-orange-400",
+                quote: "“캬아아---! (맛있는 미식 탐방)”",
+                description: "느긋하고 인생의 소소한 즐거움과 안주/미식을 즐길 줄 아는 어른스러운 성격입니다. 조용히 후배들을 챙겨주는 츤데레 매력이 있으며 휴식을 무엇보다 중요하게 생각합니다."
+            },
+            momonga: {
+                id: "momonga",
+                name: "모몽가",
+                emoji: "🐿️",
+                color: "bg-purple-50 border-purple-200 text-purple-700",
+                barColor: "bg-purple-400",
+                quote: "“귀여워해줘! 칭찬해줘!”",
+                description: "귀여움을 받고 싶어 하는 욕구가 강하며 솔직하고 당당합니다. 가끔 떼를 쓰기도 하지만 미워할 수 없는 자기애 넘치는 매력 덩어리입니다. 관심받는 것을 즐깁니다."
+            },
+            rakko: {
+                id: "rakko",
+                name: "라코",
+                emoji: "🦦",
+                color: "bg-emerald-50 border-emerald-200 text-emerald-700",
+                barColor: "bg-emerald-400",
+                quote: "“강해지기 위해서는 노력이 필요하다.”",
+                description: "실력이 뛰어나며 리더십 있고 스승처럼 든든한 존재입니다. 겉으로는 차갑고 완벽해 보이지만, 달콤한 디저트에 사족을 못 쓰는 귀여운 갭모에 반전 매력이 있습니다."
+            },
+            shisa: {
+                id: "shisa",
+                name: "시사",
+                emoji: "🦁",
+                color: "bg-red-50 border-red-200 text-red-700",
+                barColor: "bg-red-400",
+                quote: "“아르바이트 열심히 하겠습니다!”",
+                description: "성실함의 대명사! 예의가 바르고 무슨 일이든 최선을 다해 노력합니다. 주변 사람들에게 밝고 상쾌한 인사를 건네며 자신의 목표를 위해 자격증을 공부하는 노력파입니다."
+            }
+        };
+
+        const questionsData = [
+            {
+                id: 1,
+                question: "주말에 갑자기 자유 시간이 생겼을 때, 당신이 가장 먼저 하고 싶은 일은?",
+                options: [
+                    { text: "집에서 폭신한 이불을 덮고 제일 좋아하는 맛있는 음식을 먹는다.", scores: { chiikawa: 3, kurimanju: 2 } },
+                    { text: "친구들에게 먼저 연락해서 맛집이나 재미있는 곳으로 놀러 가자고 한다.", scores: { hachiware: 4, shisa: 1 } },
+                    { text: "기분에 따라 아무 목적지 없이 무작정 어디론가 신나게 떠난다.", scores: { usagi: 5 } },
+                    { text: "나만의 멋진 셀카를 찍어서 SNS에 올리고 반응을 즐긴다.", scores: { momonga: 4 } }
+                ]
+            },
+            {
+                id: 2,
+                question: "어려운 과제나 갑작스러운 시험(토벌)을 마주했을 때 나의 반응은?",
+                options: [
+                    { text: "덜컥 걱정부터 나고 눈물이 글썽이지만, 조심스럽게 도전해 본다.", scores: { chiikawa: 5 } },
+                    { text: "“어떻게든 될 거야!” 하고 긍정적으로 생각하며 친구들과 협력한다.", scores: { hachiware: 4, shisa: 1 } },
+                    { text: "소리를 한번 지르고 특유의 기세와 순발력으로 순식간에 해결해 버린다.", scores: { usagi: 4, rakko: 2 } },
+                    { text: "미리 철저하게 준비하고 계획을 세워서 완벽하게 해낸다.", scores: { rakko: 3, shisa: 3 } }
+                ]
+            },
+            {
+                id: 3,
+                question: "친구가 길을 가다 실수를 하거나 넘어졌을 때 당신은?",
+                options: [
+                    { text: "깜짝 놀라 같이 안절부절못하며 다친 곳은 없는지 다정하게 챙긴다.", scores: { chiikawa: 3, hachiware: 2 } },
+                    { text: "괜찮다고 다독여주며 밝은 분위기로 기분을 풀어주려고 노력한다.", scores: { hachiware: 4, shisa: 2 } },
+                    { text: "“푸하하!” 하고 웃으며 기발한 방식으로 친구를 일으켜 세운다.", scores: { usagi: 4, momonga: 1 } },
+                    { text: "묵묵히 다가가 손을 내밀고 연고나 밴드를 챙겨준다.", scores: { rakko: 3, kurimanju: 2 } }
+                ]
+            },
+            {
+                id: 4,
+                question: "힘든 하루를 마치고 집에 돌아왔을 때 나만의 힐링 방법은?",
+                options: [
+                    { text: "시원한 음료나 맛있는 야식을 먹으며 “캬-” 하고 스트레스를 날린다.", scores: { kurimanju: 5 } },
+                    { text: "내가 좋아하는 귀여운 인형이나 물건들을 보며 안정을 찾는다.", scores: { chiikawa: 4, momonga: 1 } },
+                    { text: "오늘 하루 있었던 일들을 일기장에 적거나 친구와 수다를 떤다.", scores: { hachiware: 3, shisa: 2 } },
+                    { text: "내일 더 발전하기 위해 공부를 하거나 운동/자기개발을 한다.", scores: { rakko: 3, shisa: 3 } }
+                ]
+            },
+            {
+                id: 5,
+                question: "사람들과 함께 있을 때 나의 주요 역할은?",
+                options: [
+                    { text: "조용히 듣고 있다가 다정하게 공감해 주는 따뜻한 리액션 담당", scores: { chiikawa: 4, hachiware: 2 } },
+                    { text: "대화를 주도하고 분위기가 어색해지지 않게 다리를 놓는 분위기 메이커", scores: { hachiware: 5 } },
+                    { text: "뜬금없는 드립이나 기돌출 행동으로 모두를 웃게 만드는 예측불가 4차원", scores: { usagi: 5 } },
+                    { text: "모두에게 관심을 받고 칭찬받고 싶어 하는 귀여운 중심 인물", scores: { momonga: 5 } }
+                ]
+            },
+            {
+                id: 6,
+                question: "원하던 자격증이나 시험에 합격했을 때 나의 모습은?",
+                options: [
+                    { text: "너무 기뻐서 눈물을 흘리며 나를 응원해 준 사람들에게 감사 인사를 전한다.", scores: { chiikawa: 4, shisa: 2 } },
+                    { text: "친구들을 모아 다 같이 맛있는 파티를 열고 기쁨을 나눈다.", scores: { hachiware: 3, kurimanju: 2 } },
+                    { text: "“이상 무!” 무덤덤하게 넘어가지만 속으로는 내심 뿌듯해한다.", scores: { rakko: 4 } },
+                    { text: "내가 이렇게 대단하다고 사방에 자랑하고 다니며 칭찬을 요구한다.", scores: { momonga: 5 } }
+                ]
+            },
+            {
+                id: 7,
+                question: "길을 가다가 정말 귀엽고 마음에 드는 물건을 발견했을 때?",
+                options: [
+                    { text: "사고 싶지만 고민고민하다가 다음에 다시 사러 오기로 한다.", scores: { chiikawa: 4 } },
+                    { text: "친구에게 “이것 봐! 진짜 귀엽지!” 하고 자랑하며 구매한다.", scores: { hachiware: 3, momonga: 2 } },
+                    { text: "고민 없이 바로 구매하거나 이미 손에 쥐고 계산대로 달려간다.", scores: { usagi: 4 } },
+                    { text: "가성비와 나에게 진짜 필요한 물건인지 신중하게 따져본다.", scores: { rakko: 2, shisa: 3 } }
+                ]
+            },
+            {
+                id: 8,
+                question: "누군가 나에게 당황스럽거나 무례한 요구를 했을 때 나의 대처는?",
+                options: [
+                    { text: "거절하기 미안해서 머뭇거리다가 우물쭈물해진다.", scores: { chiikawa: 5 } },
+                    { text: "상대방이 기분 나쁘지 않게 돌려서 상냥하게 거절한다.", scores: { hachiware: 4, shisa: 1 } },
+                    { text: "이상한 소리를 내며 딴청을 피우거나 당당하게 무시한다.", scores: { usagi: 4, momonga: 2 } },
+                    { text: "단호하고 정중하게 나의 입장을 명확하게 표현한다.", scores: { rakko: 4, kurimanju: 1 } }
+                ]
+            },
+            {
+                id: 9,
+                question: "새로운 음식점에 갔을 때 내가 메뉴를 선택하는 기준은?",
+                options: [
+                    { text: "남들이 가장 많이 먹는 안정적인 대표 시그니처 메뉴", scores: { chiikawa: 3, hachiware: 2 } },
+                    { text: "음식과 잘 어울리는 음료나 주류, 안주 조합을 고려한 미식 메뉴", scores: { kurimanju: 5 } },
+                    { text: "한 번도 본 적 없는 기묘하고 신기한 특이한 메뉴", scores: { usagi: 5 } },
+                    { text: "영양성분이나 재료가 깔끔하고 직원이 추천해 주는 정성스러운 메뉴", scores: { shisa: 3, rakko: 2 } }
+                ]
+            },
+            {
+                id: 10,
+                question: "당신이 생각하는 이상적인 삶의 모습은?",
+                options: [
+                    { text: "소중한 친구들과 함께 소소하지만 매일 안전하고 행복하게 사는 삶", scores: { chiikawa: 3, hachiware: 3 } },
+                    { text: "하고 싶은 것 다 하면서 규율에 매이지 않고 자유롭게 즐기는 삶", scores: { usagi: 4, momonga: 2 } },
+                    { text: "끊임없이 스스로를 단련하고 성장하며 타인에게 귀감이 되는 삶", scores: { rakko: 4, shisa: 2 } },
+                    { text: "여유를 만끽하며 맛있는 과자와 음료를 즐기는 평화로운 삶", scores: { kurimanju: 5 } }
+                ]
+            }
+        ];
+    </script>
+
+    <!-- ================================================================= -->
+    <!-- FRONTEND LOGIC SECTION (Application Engine) -->
+    <!-- ================================================================= -->
+    <script>
+        class ChiikawaQuizApp {
+            constructor(questions, characters) {
+                this.questions = questions;
+                this.characters = characters;
+                this.currentIndex = 0;
+                this.userAnswers = []; // Stores index of selected options
+                
+                // Initialize score tracker for each character
+                this.scores = {};
+                this.resetScores();
+
+                // UI Element References
+                this.dom = {
+                    startScreen: document.getElementById('start-screen'),
+                    quizScreen: document.getElementById('quiz-screen'),
+                    resultScreen: document.getElementById('result-screen'),
+                    questionNumber: document.getElementById('question-number'),
+                    progressPercent: document.getElementById('progress-percent'),
+                    progressBar: document.getElementById('progress-bar'),
+                    questionText: document.getElementById('question-text'),
+                    optionsContainer: document.getElementById('options-container'),
+                    prevBtn: document.getElementById('prev-btn'),
+                    toast: document.getElementById('toast')
+                };
+            }
+
+            resetScores() {
+                Object.keys(this.characters).forEach(charKey => {
+                    this.scores[charKey] = 0;
+                });
+            }
+
+            startQuiz() {
+                this.currentIndex = 0;
+                this.userAnswers = [];
+                this.resetScores();
+
+                this.dom.startScreen.classList.add('hidden');
+                this.dom.resultScreen.classList.add('hidden');
+                this.dom.quizScreen.classList.remove('hidden');
+
+                this.renderQuestion();
+            }
+
+            renderQuestion() {
+                const currentQ = this.questions[this.currentIndex];
+                const totalQ = this.questions.length;
+                const progressPct = Math.round(((this.currentIndex + 1) / totalQ) * 100);
+
+                // Update Progress UI
+                this.dom.questionNumber.innerText = `Question ${this.currentIndex + 1} / ${totalQ}`;
+                this.dom.progressPercent.innerText = `${progressPct}%`;
+                this.dom.progressBar.style.width = `${progressPct}%`;
+
+                // Update Question Text
+                this.dom.questionText.innerText = currentQ.question;
+
+                // Render Options
+                this.dom.optionsContainer.innerHTML = '';
+                currentQ.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = `cute-btn w-full p-4 text-left rounded-2xl bg-white hover:bg-pink-50 font-medium text-gray-700 text-sm sm:text-base flex items-center justify-between group fade-in`;
+                    
+                    // Highlight selected if user goes back
+                    if (this.userAnswers[this.currentIndex] === idx) {
+                        btn.classList.add('border-pink-400', 'bg-pink-100', 'text-pink-700');
+                    }
+
+                    btn.innerHTML = `
+                        <span>${opt.text}</span>
+                        <i class="fa-regular fa-circle-check text-pink-300 group-hover:text-pink-500 transition-colors"></i>
+                    `;
+                    btn.onclick = () => this.selectOption(idx);
+                    this.dom.optionsContainer.appendChild(btn);
+                });
+
+                // Prev Button State
+                this.dom.prevBtn.disabled = this.currentIndex === 0;
+            }
+
+            selectOption(optionIndex) {
+                this.userAnswers[this.currentIndex] = optionIndex;
+
+                if (this.currentIndex < this.questions.length - 1) {
+                    this.currentIndex++;
+                    this.renderQuestion();
+                } else {
+                    this.calculateAndShowResult();
+                }
+            }
+
+            prevQuestion() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.renderQuestion();
+                }
+            }
+
+            calculateAndShowResult() {
+                this.resetScores();
+
+                // Aggregate scores from user's answers
+                this.userAnswers.forEach((selectedOptIdx, qIdx) => {
+                    const option = this.questions[qIdx].options[selectedOptIdx];
+                    if (option && option.scores) {
+                        Object.entries(option.scores).forEach(([charKey, scoreVal]) => {
+                            if (this.scores[charKey] !== undefined) {
+                                this.scores[charKey] += scoreVal;
+                            }
+                        });
+                    }
+                });
+
+                // Calculate total points and percentages
+                const totalPoints = Object.values(this.scores).reduce((a, b) => a + b, 0) || 1;
+                
+                const scoreEntries = Object.keys(this.scores).map(key => {
+                    const rawScore = this.scores[key];
+                    const percentage = Math.round((rawScore / totalPoints) * 100);
+                    return {
+                        id: key,
+                        score: rawScore,
+                        percentage: percentage,
+                        meta: this.characters[key]
+                    };
+                });
+
+                // Sort by highest score
+                scoreEntries.sort((a, b) => b.score - a.score);
+
+                const topResult = scoreEntries[0];
+
+                // Render Result UI
+                document.getElementById('top-character-name').innerText = topResult.meta.name;
+                document.getElementById('character-emoji').innerText = topResult.meta.emoji;
+                document.getElementById('character-quote').innerText = topResult.meta.quote;
+                document.getElementById('character-desc').innerText = topResult.meta.description;
+
+                const resultCard = document.getElementById('result-card');
+                resultCard.className = `p-6 rounded-2xl mb-6 text-center border-2 transition-all ${topResult.meta.color}`;
+
+                // Render Score Breakdown
+                const breakdownList = document.getElementById('breakdown-list');
+                breakdownList.innerHTML = '';
+
+                scoreEntries.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'bg-white/80 p-2.5 rounded-xl border border-pink-100 flex items-center gap-3 text-xs sm:text-sm';
+                    row.innerHTML = `
+                        <span class="text-xl w-7 text-center">${item.meta.emoji}</span>
+                        <div class="flex-1">
+                            <div class="flex justify-between font-bold mb-1 text-gray-700">
+                                <span>${item.meta.name}</span>
+                                <span>${item.percentage}%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                <div class="${item.meta.barColor} h-full rounded-full transition-all duration-500" style="width: ${item.percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                    breakdownList.appendChild(row);
+                });
+
+                // Switch Views
+                this.dom.quizScreen.classList.add('hidden');
+                this.dom.resultScreen.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            restartQuiz() {
+                this.dom.resultScreen.classList.add('hidden');
+                this.dom.startScreen.classList.remove('hidden');
+            }
+
+            copyShareUrl() {
+                const dummyUrl = window.location.href;
+                
+                // Fallback safe copy mechanism
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(dummyUrl);
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = dummyUrl;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                }
+
+                // Show Toast
+                this.dom.toast.style.opacity = '1';
+                setTimeout(() => {
+                    this.dom.toast.style.opacity = '0';
+                }, 2000);
+            }
+        }
+
+        // Initialize App on Page Load
+        let quizApp;
+        window.onload = function() {
+            quizApp = new ChiikawaQuizApp(questionsData, characterMetadata);
+        };
+    </script>
+</body>
+</html>
+```
